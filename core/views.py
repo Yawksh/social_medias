@@ -6,7 +6,7 @@ from  django.contrib.auth.decorators import  login_required
 from django.http import HttpResponse
 
 
-# Create your views here.
+# Create your views here. as much as needed
 @login_required(login_url="signin")
 def index(request):
     user_object=User.objects.get(username=request.user.username)
