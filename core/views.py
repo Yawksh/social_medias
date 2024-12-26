@@ -36,6 +36,7 @@ def signup(request):
                user_model=User.objects.get(username=username)
                     # Create a profile object for the new user
                try:
+                    
                     new_profile = Profile.objects.create(user=user_model, id_user=user.id)
                     new_profile.save()
                     messages.success(request, "User created successfully!")
