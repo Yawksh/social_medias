@@ -1,0 +1,69 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static 'assets/images/favicon.png' %}" rel="icon" type="image/png">
+    <title>Sign Up</title>
+    
+    <link rel="stylesheet" href="{% static 'assets/css/icons.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/uikit.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/tailwind.css' %}">
+</head>
+
+<body class="bg-gray-100">
+    <div id="wrapper" class="flex flex-col justify-between h-screen">
+
+        <!-- Header -->
+        <header class="bg-white py-4 shadow dark:bg-gray-800">
+            <div class="max-w-6xl mx-auto flex items-center justify-between">
+                <a href="#">
+                    <b><h1 style="font-size: 1.5rem;">Social Book</h1></b>
+                </a>
+                <div class="flex items-center">
+                    <a href="#" class="bg-pink-500 px-6 py-3 rounded-md shadow text-white">Login</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <main>
+            <div class="lg:p-12 max-w-md lg:my-0 my-12 mx-auto p-6 space-y-4">
+                <h1 class="lg:text-3xl text-xl font-semibold mb-6">Sign Up</h1>
+                <div class="error">
+                    {% for message in messages %}
+                        <h5 style="color:red; font-size:10px;">{{ message }}</h5>
+                    {% endfor %}
+                </div>
+                <form action="{% url 'signup' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="text" placeholder="Username" name="username" required class="bg-gray-200 mb-2 shadow-none dark:bg-gray-800 border border-gray-300">
+                    <input type="email" name="email" placeholder="Email" required class="bg-gray-200 mb-2 shadow-none dark:bg-gray-800 border border-gray-300">
+                    <input type="password" name="password1" placeholder="Password" required class="bg-gray-200 mb-2 shadow-none dark:bg-gray-800 border border-gray-300">
+                    <input type="password" name="password2" placeholder="Confirm Password" required class="bg-gray-200 mb-2 shadow-none dark:bg-gray-800 border border-gray-300">
+                    
+                    <div class="flex justify-start my-4 space-x-1">
+                        <div class="checkbox">
+                            <input type="checkbox" id="checkbox1" name="agree" checked>
+                            <label for="checkbox1"><span class="checkbox-icon"></span> I Agree</label>
+                        </div>
+                        <a href="#">Terms and Conditions</a>
+                    </div> 
+                    
+                    <button type="submit" class="bg-gradient-to-br from-pink-500 py-3 rounded-md text-white text-xl to-red-400 w-full">Sign Up</button>
+                    
+                    <div class="text-center mt-5 space-x-2">
+                        <p>Do you have an account? <a href="#">Login</a></p>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="lg:mb-5 py-3 uk-link-reset">
+            <div class="flex flex-col items-center justify-between lg:flex-row max-w-6xl mx-auto lg:space-y-0 space-y-3">
+                <div class="flex space-x-2 text-gray-700 uppercase">
