@@ -3,7 +3,6 @@ from django.contrib.auth.models import User,auth
 from  django.contrib import  messages
 from .models import  Profile,Post
 from  django.contrib.auth.decorators import  login_required
-
 from django.http import HttpResponse
 
 
@@ -12,7 +11,8 @@ from django.http import HttpResponse
 def index(request):
     user_object=User.objects.get(username=request.user.username)
     user_profile=Profile.objects.get(user=user_object)
-    return  render(request,'index.html',{"user_profile":user_profile})
+    posts=Post.objects.all()
+    return  render(request,'index.html',{"user_profile":user_profile,'posts':posts})
 def signup(request):
     if request.method=="POST":
         username=request.POST.get("username")
