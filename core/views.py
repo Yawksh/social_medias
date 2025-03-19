@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.models import User,auth
 from  django.contrib import  messages
-from .models import  Profile,Post
+from .models import  Profile,Post,LikePost
 from  django.contrib.auth.decorators import  login_required
 from django.http import HttpResponse
 
@@ -110,3 +110,8 @@ def upload(request):
 
         
     return render("index.html")
+@login_required(login_url="signin")
+def like_post(request):
+    username = request.user.username
+    post_id = request.Get.get('post_id')
+    post = Post.objects.filter(post_id = post_id)
