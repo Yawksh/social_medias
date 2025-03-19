@@ -4,6 +4,7 @@ from  django.contrib import  messages
 from .models import  Profile,Post,LikePost
 from  django.contrib.auth.decorators import  login_required
 from django.http import HttpResponse
+from django.core.exceptions import ValidationError
 
 
 # Create your views here. as much as needed
@@ -54,7 +55,7 @@ def signup(request):
     else:
         return render(request,"signup.html")
 def signin(request):
-    if request.method=="POST":
+    if request.method == "POST":
         username=request.POST.get("username")
         password=request.POST.get("password")
         user=auth.authenticate(username=username,password=password)
@@ -113,5 +114,23 @@ def upload(request):
 @login_required(login_url="signin")
 def like_post(request):
     username = request.user.username
-    post_id = request.Get.get('post_id')
-    post = Post.objects.filter(post_id = post_id)
+    post_id = request.GET.get('post_id')  # Get post_id from URL
+
+    try:
+        post = Post.objects.get(id=post_id)  # Ensure post exists
+    except (Post.DoesNotExist, ValidationError):
+        return redirect('/')  # Redirect if post_id is invalid
+
+    like_filter = LikePost.objects.filter(post=post, username=username).first()
+
+    if like_filter is None:
+        LikePost.objects.create(post=post, username=username)
+        post.no_of_likes = post.no_of_likes + 1  # Increment likes
+    else:
+        like_filter.delete()
+        post.no_of_likes = post.no_of_likes - 1  # Decrement likes
+
+    post.save()  # Save the updated count
+    return redirect('/')
+
+    
