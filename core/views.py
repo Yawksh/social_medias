@@ -1,4 +1,9 @@
-from django.shortcuts import render,redirect
+from django.db import transaction
+from django.db.models import F
+from django.contrib.auth.decorators import login_required
+
+
+from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth.models import User,auth
 from  django.contrib import  messages
 from .models import  Profile,Post,LikePost
@@ -89,7 +94,7 @@ def settings(request):
         
         # Redirect after saving changes
         messages.success(request, "Profile updated successfully!")
-        return redirect("settings")
+        return redirect("/")
 
     return render(request, "setting.html", {"user_profile": user_profile})
 def upload(request):
@@ -113,24 +118,38 @@ def upload(request):
     return render("index.html")
 @login_required(login_url="signin")
 def like_post(request):
-    username = request.user.username
-    post_id = request.GET.get('post_id')  # Get post_id from URL
-
-    try:
-        post = Post.objects.get(id=post_id)  # Ensure post exists
-    except (Post.DoesNotExist, ValidationError):
-        return redirect('/')  # Redirect if post_id is invalid
-
-    like_filter = LikePost.objects.filter(post=post, username=username).first()
-
-    if like_filter is None:
-        LikePost.objects.create(post=post, username=username)
-        post.no_of_likes = post.no_of_likes + 1  # Increment likes
-    else:
-        like_filter.delete()
-        post.no_of_likes = post.no_of_likes - 1  # Decrement likes
-
-    post.save()  # Save the updated count
-    return redirect('/')
-
+    if request.method == 'POST':
+        post_id = request.POST.get('post_id')
+        post = get_object_or_404(Post, id=post_id)
+        
+        with transaction.atomic():
+            like, created = LikePost.objects.get_or_create(
+                post=post,
+                username=request.user.username
+            )
+            
+            if not created:
+                like.delete()
+                post.no_of_likes -= 1
+                
+            else:
+                post.no_of_likes += 1
+                
+            
+            post.save()
+        
+        return redirect('/')
     
+    return redirect('/')
+login_required(login_url="signin")
+def profile(request,pk):
+    user_object =  User.objects.get(username = pk)
+    user_profile = Profile.objects.get(user = user_object)
+    user_post = Post.objects.filter(user = user_object)
+    post_len = len(user_post)
+    context = {'user_object':user_object,
+               'user_profile':user_profile,
+               "user_post":user_post,
+               "post_len":post_len}
+    return render(request, 'profile.html',context)
+
